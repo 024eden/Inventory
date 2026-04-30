@@ -554,10 +554,10 @@ class POSFrame(tk.Frame):
         self._recalculate()
 
     def _recalculate(self):
-        subtotal = sum(i["total"] for i in self.cart)
+        subtotal = float(sum(i["total"] for i in self.cart))
         try:
-            disc_pct = float(self.discount_var.get() or 0)
-            tax_pct  = float(self.tax_var.get() or 0)
+            disc_pct = float((self.discount_var.get() or '0').replace('%', ''))
+            tax_pct  = float((self.tax_var.get() or '0').replace('%', ''))
         except ValueError:
             disc_pct = tax_pct = 0
         disc_amt = subtotal * disc_pct / 100
@@ -566,7 +566,6 @@ class POSFrame(tk.Frame):
         self.subtotal_var.set(f"{subtotal:.2f}")
         self.total_var.set(f"{total:.2f}")
         self._show_change()
-
     def _show_change(self):
         try:
             total = float(self.total_var.get())
@@ -639,8 +638,8 @@ class POSFrame(tk.Frame):
             messagebox.showwarning("Empty Cart", "Add items to cart first!")
             return
         subtotal = float(self.subtotal_var.get())
-        disc_pct = float(self.discount_var.get() or 0)
-        tax_pct  = float(self.tax_var.get() or 0)
+        disc_pct = float((self.discount_var.get() or '0').replace('%', ''))
+        tax_pct  = float((self.tax_var.get() or '0').replace('%', ''))
         disc_amt = subtotal * disc_pct / 100
         tax_amt  = (subtotal - disc_amt) * tax_pct / 100
         total    = subtotal - disc_amt + tax_amt
@@ -1012,7 +1011,7 @@ class CustomerFrame(tk.Frame):
                 c["id"], c["name"], c.get("phone",""), c.get("email",""),
                 c.get("address",""), f"{c['points']:.0f}",
                 format_currency(c["total_spent"]),
-                c["created_at"][:10]))
+              (c["created_at"] or "")[:10]))
 
     def _add(self):
         CustomerDialog(self, None).grab_set()
